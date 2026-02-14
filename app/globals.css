@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F5F0EB;
+  --foreground: #1A1A1A;
+  --card: #EBE5DE;
+  --card-hover: #E3DCD4;
+  --border: #D8D0C6;
+  --border-hover: #C5BCB0;
+  --muted: #7A746D;
+  --accent: #C07A50;
+  --accent-hover: #A96A44;
+  --accent-dim: rgba(192, 122, 80, 0.08);
+  --footer-bg: #1A1A1A;
+  --footer-text: #E5E0DA;
+  --footer-muted: #9A948D;
+  /* Section backgrounds (homepage curated/comparisons/CTA) */
+  --section-green-bg: #D9E8DC;
+  --section-green-border: #C5D8C9;
+  --section-green-muted: #5A6E5D;
+  --section-lavender-bg: #DDD8E8;
+  --section-lavender-border: #CCC6D8;
+  --section-lavender-muted: #5E576B;
+  --section-lavender-accent: #8A8394;
+  --section-warm-bg: #E8DDD4;
+  --section-warm-border: #D8CCBE;
+  --section-warm-muted: #6E6358;
+  --section-warm-border-alt: #C5B8A8;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-dim: var(--accent-dim);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-lora);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection */
+::selection {
+  background: rgba(192, 122, 80, 0.2);
+  color: var(--foreground);
 }
