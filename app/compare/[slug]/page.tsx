@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { comparisons, getComparisonBySlug, getToolBySlug } from "@/lib/data";
+import { comparisons, getComparisonBySlug, getToolBySlug } from "@/lib/db/tools";
 import { CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/types";
 
 export async function generateStaticParams() {
@@ -15,6 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: comparison.seoTitle,
     description: comparison.seoDescription,
+    alternates: { canonical: `/compare/${slug}` },
     openGraph: {
       title: comparison.seoTitle,
       description: comparison.seoDescription,
@@ -27,12 +28,55 @@ export default async function ComparePage({ params }: { params: Promise<{ slug: 
   const comparison = getComparisonBySlug(slug);
   if (!comparison) notFound();
 
-  const toolA = getToolBySlug(comparison.toolASlug);
-  const toolB = getToolBySlug(comparison.toolBSlug);
+  const [toolA, toolB] = await Promise.all([
+    getToolBySlug(comparison.toolASlug),
+    getToolBySlug(comparison.toolBSlug),
+  ]);
   if (!toolA || !toolB) notFound();
+
+  // Pre-resolve tools for "More Comparisons" section
+  const otherComps = comparisons.filter((c) => c.slug !== slug);
+  const otherComparisons = await Promise.all(
+    otherComps.map(async (comp) => ({
+      comp,
+      a: await getToolBySlug(comp.toolASlug),
+      b: await getToolBySlug(comp.toolBSlug),
+    }))
+  );
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://hot100ai.dev" },
+      { "@type": "ListItem", position: 2, name: "Compare", item: "https://hot100ai.dev" },
+      { "@type": "ListItem", position: 3, name: `${toolA.name} vs ${toolB.name}`, item: `https://hot100ai.dev/compare/${slug}` },
+    ],
+  };
+
+  const webPageLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: comparison.seoTitle,
+    description: comparison.seoDescription,
+    url: `https://hot100ai.dev/compare/${slug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Hot 100 AI",
+      url: "https://hot100ai.dev",
+    },
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
+      />
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-xs text-muted">
         <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
@@ -140,11 +184,7 @@ export default async function ComparePage({ params }: { params: Promise<{ slug: 
       <section className="mt-16 border-t border-border pt-10">
         <h2 className="font-serif text-xl font-medium text-foreground">More Comparisons</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {comparisons
-            .filter((c) => c.slug !== slug)
-            .map((comp) => {
-              const a = getToolBySlug(comp.toolASlug);
-              const b = getToolBySlug(comp.toolBSlug);
+          {otherComparisons.map(({ comp, a, b }) => {
               if (!a || !b) return null;
               return (
                 <Link

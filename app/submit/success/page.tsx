@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Submission Successful",
-  description: "Your tool has been submitted to AgentIndex.",
+  description: "Your tool has been submitted to Hot 100 AI.",
 };
 
 export default function SubmitSuccessPage() {

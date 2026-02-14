@@ -22,9 +22,10 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://hot100ai.dev"),
   title: {
-    default: "AgentIndex — The Canonical Index of AI Agents, MCP Servers & Agentic Tools",
-    template: "%s — AgentIndex",
+    default: "Hot 100 AI — The Canonical Index of AI Agents, MCP Servers & Agentic Tools",
+    template: "%s — Hot 100 AI",
   },
   description:
     "Discover, compare, and choose the right AI agents, MCP servers, and agentic tools for your stack. Built for developers, by developers.",
@@ -41,16 +42,18 @@ export const metadata: Metadata = {
     "AI developer tools",
   ],
   openGraph: {
-    title: "AgentIndex — The BuiltWith for AI Agents",
+    title: "Hot 100 AI — The BuiltWith for AI Agents",
     description: "The canonical index of AI agents, MCP servers, and agentic tools.",
-    url: "https://agentindex.dev",
-    siteName: "AgentIndex",
+    url: "https://hot100ai.dev",
+    siteName: "Hot 100 AI",
     type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Hot 100 AI" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AgentIndex — The BuiltWith for AI Agents",
+    title: "Hot 100 AI — The BuiltWith for AI Agents",
     description: "The canonical index of AI agents, MCP servers, and agentic tools.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,

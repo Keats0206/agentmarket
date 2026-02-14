@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { mcpPlatforms, tools } from "@/lib/data";
+import { mcpPlatforms, getAllTools } from "@/lib/db/tools";
 import ToolCard from "@/components/ToolCard";
 
 export const metadata: Metadata = {
@@ -9,7 +9,8 @@ export const metadata: Metadata = {
     "The most comprehensive directory of MCP (Model Context Protocol) servers. Browse by platform, use case, and integration. Find MCP servers for GitHub, Slack, Notion, databases, and more.",
 };
 
-export default function MCPServersPage() {
+export default async function MCPServersPage() {
+  const tools = await getAllTools();
   const allMCPServers = tools.filter((t) => t.category === "mcp-server");
 
   return (

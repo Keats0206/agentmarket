@@ -5,7 +5,7 @@ import UpgradeButton from "@/components/UpgradeButton";
 
 export const metadata: Metadata = {
   title: "Submit Your Tool",
-  description: "Get your AI tool, MCP server, or agent framework listed on AgentIndex. Free basic listing, sponsored options available.",
+  description: "Get your AI tool, MCP server, or agent framework listed on Hot 100 AI. Free basic listing, sponsored options available.",
 };
 
 export default function SubmitPage() {
@@ -20,7 +20,7 @@ export default function SubmitPage() {
 
       <h1 className="font-serif text-3xl font-medium text-foreground">Submit Your Tool</h1>
       <p className="mt-3 text-sm text-muted leading-relaxed">
-        Get your AI agent, MCP server, or developer tool listed on AgentIndex.
+        Get your AI agent, MCP server, or developer tool listed on Hot 100 AI.
         We review every submission manually to maintain quality.
       </p>
 
@@ -117,7 +117,7 @@ export default function SubmitPage() {
           />
         </div>
         <p className="mt-4 text-[10px] text-muted">
-          Or email <a href="mailto:sponsors@agentindex.dev" className="text-accent hover:text-accent-hover">sponsors@agentindex.dev</a> for custom packages
+          Or email <a href="mailto:sponsors@hot100ai.dev" className="text-accent hover:text-accent-hover">sponsors@hot100ai.dev</a> for custom packages
         </p>
       </div>
     </div>

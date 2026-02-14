@@ -1,9 +1,18 @@
 import type { Tool, ToolCategory } from "../types";
+import { categories } from "../data/categories";
+import { comparisons } from "../data/comparisons";
+import { mcpPlatforms } from "../data/mcpPlatforms";
+
+export { categories, comparisons, mcpPlatforms };
+export type { CategoryPage, ComparisonPage, MCPPlatform } from "../types";
 
 // ---------------------------------------------------------------------------
-// Data access layer for tools.
+// Unified data access layer for tools.
 // When NEXT_PUBLIC_SUPABASE_URL is set, reads from Supabase.
 // Otherwise falls back to the static in-memory data so the site always works.
+//
+// All pages should import from this module (via @/lib/db/tools) instead of
+// @/lib/data so that DB-added tools appear automatically.
 // ---------------------------------------------------------------------------
 
 const USE_DB = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
@@ -41,6 +50,8 @@ function rowToTool(row: Record<string, unknown>): Tool {
   };
 }
 
+// ── Core async queries ────────────────────────────────────────────────────
+
 export async function getAllTools(): Promise<Tool[]> {
   if (!USE_DB) return getStaticData();
 
@@ -75,7 +86,6 @@ export async function getToolBySlug(slug: string): Promise<Tool | undefined> {
     .single();
 
   if (error || !data) {
-    // Fallback to static
     const tools = await getStaticData();
     return tools.find((t) => t.slug === slug);
   }
@@ -126,9 +136,85 @@ export async function getFeaturedTools(): Promise<Tool[]> {
   return data.map(rowToTool);
 }
 
-export async function searchToolsFromDB(query: string): Promise<Tool[]> {
-  // Always use in-memory search for now (works with both DB and static)
-  // because Supabase full-text search would require a dedicated column/index.
-  const { searchTools } = await import("../data/index");
-  return searchTools(query);
+// ── Search (in-memory scoring over DB or static tools) ────────────────────
+
+export async function searchTools(query: string): Promise<Tool[]> {
+  const tools = await getAllTools();
+  if (!query) return tools;
+
+  const q = query.toLowerCase();
+
+  const scored = tools
+    .map((t) => {
+      let score = 0;
+      const name = t.name.toLowerCase();
+      const shortDesc = t.shortDescription.toLowerCase();
+      const desc = t.description.toLowerCase();
+      const cat = t.category.toLowerCase();
+
+      if (name === q) score += 100;
+      else if (name.startsWith(q)) score += 80;
+      else if (name.includes(q)) score += 60;
+
+      if (shortDesc.includes(q)) score += 30;
+      if (cat === q || cat.replace("-", " ") === q) score += 40;
+      if (desc.includes(q)) score += 10;
+      if (t.subcategories.some((s) => s.toLowerCase().includes(q))) score += 20;
+      if (t.useCases.some((u) => u.toLowerCase().includes(q))) score += 15;
+      if (t.integrations.some((i) => i.toLowerCase().includes(q))) score += 10;
+
+      if (t.sponsoredTier === "premium") score += 5;
+      else if (t.sponsoredTier === "category") score += 3;
+      else if (t.sponsoredTier === "basic") score += 1;
+      if (t.featured) score += 2;
+
+      return { tool: t, score };
+    })
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return scored.map((s) => s.tool);
+}
+
+// ── Helpers (re-exported for convenience) ─────────────────────────────────
+
+export function getCategoryBySlug(slug: string) {
+  return categories.find((c) => c.slug === slug);
+}
+
+export function getComparisonBySlug(slug: string) {
+  return comparisons.find((c) => c.slug === slug);
+}
+
+export function getMCPPlatformBySlug(slug: string) {
+  return mcpPlatforms.find((p) => p.slug === slug);
+}
+
+export function formatStars(stars: number): string {
+  if (stars >= 1000) {
+    return `${(stars / 1000).toFixed(stars >= 10000 ? 0 : 1)}K`;
+  }
+  return stars.toString();
+}
+
+const TIER_PRIORITY: Record<string, number> = { premium: 4, category: 3, featured: 3, basic: 2 };
+
+export function sortByPremium(toolList: Tool[]): Tool[] {
+  return [...toolList].sort((a, b) => {
+    const aPriority = TIER_PRIORITY[a.sponsoredTier || ""] || 0;
+    const bPriority = TIER_PRIORITY[b.sponsoredTier || ""] || 0;
+    if (bPriority !== aPriority) return bPriority - aPriority;
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+export async function getStats() {
+  const tools = await getAllTools();
+  return {
+    totalTools: tools.length,
+    totalCategories: categories.length,
+    totalComparisons: comparisons.length,
+    totalMCPServers: tools.filter((t) => t.category === "mcp-server").length,
+  };
 }

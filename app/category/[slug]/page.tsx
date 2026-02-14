@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { categories, getCategoryBySlug, getToolBySlug, sortByPremium } from "@/lib/data";
+import { categories, getCategoryBySlug, getToolBySlug, sortByPremium } from "@/lib/db/tools";
 import ToolCard from "@/components/ToolCard";
 
 export async function generateStaticParams() {
@@ -15,6 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: category.seoTitle,
     description: category.seoDescription,
+    alternates: { canonical: `/category/${slug}` },
     openGraph: {
       title: category.seoTitle,
       description: category.seoDescription,
@@ -27,14 +28,51 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const category = getCategoryBySlug(slug);
   if (!category) notFound();
 
-  const categoryTools = sortByPremium(
-    category.toolSlugs
-      .map((slug) => getToolBySlug(slug))
-      .filter(Boolean) as NonNullable<ReturnType<typeof getToolBySlug>>[]
+  const resolvedTools = await Promise.all(
+    category.toolSlugs.map((s) => getToolBySlug(s))
   );
+  const categoryTools = sortByPremium(
+    resolvedTools.filter(Boolean) as Exclude<Awaited<ReturnType<typeof getToolBySlug>>, undefined>[]
+  );
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://hot100ai.dev" },
+      { "@type": "ListItem", position: 2, name: "Categories", item: "https://hot100ai.dev" },
+      { "@type": "ListItem", position: 3, name: category.title, item: `https://hot100ai.dev/category/${slug}` },
+    ],
+  };
+
+  const collectionLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: category.title,
+    description: category.description,
+    url: `https://hot100ai.dev/category/${slug}`,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: categoryTools.length,
+      itemListElement: categoryTools.map((tool, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: tool.name,
+        url: `https://hot100ai.dev/tool/${tool.slug}`,
+      })),
+    },
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+      />
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-xs text-muted">
         <Link href="/" className="hover:text-foreground transition-colors">Home</Link>

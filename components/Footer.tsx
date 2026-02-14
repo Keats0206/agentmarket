@@ -53,12 +53,12 @@ export default function Footer() {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-[#2A2A2A] pt-8 sm:flex-row">
           <p className="text-xs text-[#7A746D]">
-            &copy; {new Date().getFullYear()} AgentIndex.dev. Built for developers, by developers.
+            &copy; {new Date().getFullYear()} Hot 100 AI. Built for developers, by developers.
           </p>
           <div className="flex items-center gap-4">
             <Link href="/submit" className="text-xs text-[#9A948D] hover:text-white transition-colors">Submit a Tool</Link>
             <span className="text-[#333]">|</span>
-            <a href="mailto:hello@agentindex.dev" className="text-xs text-[#9A948D] hover:text-white transition-colors">Contact</a>
+            <a href="mailto:hello@hot100ai.dev" className="text-xs text-[#9A948D] hover:text-white transition-colors">Contact</a>
             <span className="text-[#333]">|</span>
             <Link href="/search" className="text-xs text-[#9A948D] hover:text-white transition-colors">Search</Link>
           </div>

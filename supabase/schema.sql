@@ -1,5 +1,5 @@
 -- ============================================================================
--- AgentIndex Database Schema
+-- Hot 100 AI Database Schema
 -- Run this in Supabase SQL Editor to set up the database
 -- ============================================================================
 

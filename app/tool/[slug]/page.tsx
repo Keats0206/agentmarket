@@ -1,22 +1,26 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { tools, getToolBySlug, formatStars, comparisons, categories } from "@/lib/data";
+import { getAllTools, getToolBySlug, formatStars, comparisons, categories } from "@/lib/db/tools";
 import { CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/types";
 
 export async function generateStaticParams() {
+  const tools = await getAllTools();
   return tools.map((tool) => ({ slug: tool.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const tool = getToolBySlug(slug);
+  const tool = await getToolBySlug(slug);
   if (!tool) return { title: "Tool Not Found" };
   return {
     title: `${tool.name} — ${tool.shortDescription}`,
-    description: tool.description,
+    description: tool.description.length > 160
+      ? tool.description.slice(0, 157).replace(/\s+\S*$/, "") + "..."
+      : tool.description,
+    alternates: { canonical: `/tool/${slug}` },
     openGraph: {
-      title: `${tool.name} — AgentIndex`,
+      title: `${tool.name} — Hot 100 AI`,
       description: tool.shortDescription,
     },
   };
@@ -24,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ToolPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const tool = getToolBySlug(slug);
+  const [tool, allTools] = await Promise.all([getToolBySlug(slug), getAllTools()]);
   if (!tool) notFound();
 
   const relatedComparisons = comparisons.filter(
@@ -33,7 +37,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
 
   const relatedCategories = categories.filter((c) => c.toolSlugs.includes(slug));
 
-  const similarTools = tools
+  const similarTools = allTools
     .filter((t) => t.slug !== slug && t.category === tool.category)
     .slice(0, 4);
 
@@ -62,11 +66,25 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
     }),
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://hot100ai.dev" },
+      { "@type": "ListItem", position: 2, name: `${CATEGORY_LABELS[tool.category]}s`, item: `https://hot100ai.dev/search?q=${tool.category}` },
+      { "@type": "ListItem", position: 3, name: tool.name, item: `https://hot100ai.dev/tool/${slug}` },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-xs text-muted">
@@ -213,7 +231,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               <div className="mt-3 space-y-2">
                 {relatedComparisons.map((comp) => {
                   const other = comp.toolASlug === slug ? comp.toolBSlug : comp.toolASlug;
-                  const otherTool = tools.find((t) => t.slug === other);
+                  const otherTool = allTools.find((t) => t.slug === other);
                   return (
                     <Link
                       key={comp.slug}

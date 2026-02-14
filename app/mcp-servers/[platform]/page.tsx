@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { mcpPlatforms, getMCPPlatformBySlug, getToolBySlug } from "@/lib/data";
+import { mcpPlatforms, getMCPPlatformBySlug, getToolBySlug } from "@/lib/db/tools";
 import ToolCard from "@/components/ToolCard";
 
 export async function generateStaticParams() {
@@ -23,9 +23,10 @@ export default async function MCPPlatformPage({ params }: { params: Promise<{ pl
   const platform = getMCPPlatformBySlug(platformSlug);
   if (!platform) notFound();
 
-  const platformTools = platform.toolSlugs
-    .map((slug) => getToolBySlug(slug))
-    .filter(Boolean) as NonNullable<ReturnType<typeof getToolBySlug>>[];
+  const resolvedTools = await Promise.all(
+    platform.toolSlugs.map((s) => getToolBySlug(s))
+  );
+  const platformTools = resolvedTools.filter(Boolean) as Exclude<Awaited<ReturnType<typeof getToolBySlug>>, undefined>[];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">

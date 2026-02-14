@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Dashboard",
-  description: "Manage your AgentIndex tool listings and subscriptions.",
+  description: "Manage your Hot 100 AI tool listings and subscriptions.",
 };
 
 async function getUser() {

@@ -56,7 +56,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-24 sm:px-6">
       <div className="text-center mb-8">
-        <h1 className="font-serif text-2xl font-medium text-foreground">Sign in to AgentIndex</h1>
+        <h1 className="font-serif text-2xl font-medium text-foreground">Sign in to Hot 100 AI</h1>
         <p className="mt-2 text-sm text-muted">
           Manage your tool listings and subscriptions
         </p>

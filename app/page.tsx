@@ -1,11 +1,15 @@
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import ToolCard from "@/components/ToolCard";
-import { tools, categories, comparisons, stats, getFeaturedTools } from "@/lib/data";
+import { getAllTools, categories, comparisons, getStats, getFeaturedTools } from "@/lib/db/tools";
 import { CATEGORY_LABELS, CATEGORY_COLORS, type ToolCategory } from "@/lib/types";
 
-export default function Home() {
-  const featured = getFeaturedTools();
+export default async function Home() {
+  const [tools, featured, stats] = await Promise.all([
+    getAllTools(),
+    getFeaturedTools(),
+    getStats(),
+  ]);
   const categoryGroups: { category: ToolCategory; count: number }[] = [
     { category: "agent", count: tools.filter((t) => t.category === "agent").length },
     { category: "mcp-server", count: tools.filter((t) => t.category === "mcp-server").length },
@@ -14,8 +18,42 @@ export default function Home() {
     { category: "platform", count: tools.filter((t) => t.category === "platform").length },
   ];
 
+  const websiteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Hot 100 AI",
+    url: "https://hot100ai.dev",
+    description: "The canonical index of AI agents, MCP servers, and agentic tools.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://hot100ai.dev/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const featuredListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Featured AI Tools",
+    numberOfItems: featured.length,
+    itemListElement: featured.slice(0, 10).map((tool, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: tool.name,
+      url: `https://hot100ai.dev/tool/${tool.slug}`,
+    })),
+  };
+
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(featuredListLd) }}
+      />
       {/* Hero */}
       <section className="relative border-b border-border">
         <div className="relative mx-auto max-w-4xl px-4 pb-16 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-32 lg:px-8">
@@ -104,7 +142,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-serif text-2xl font-medium text-foreground">Featured Tools</h2>
-              <p className="mt-1.5 text-sm text-muted">Highlighted by the AgentIndex team</p>
+              <p className="mt-1.5 text-sm text-muted">Highlighted by the Hot 100 AI team</p>
             </div>
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
