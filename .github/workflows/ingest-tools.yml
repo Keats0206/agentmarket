@@ -1,0 +1,41 @@
+# Run the AI tool ingestion pipeline on a schedule (and optionally on demand).
+# Discovers candidates, enriches with LLM, inserts new tools into Supabase.
+#
+# Required repo secrets:
+#   OPENAI_API_KEY
+#   NEXT_PUBLIC_SUPABASE_URL
+#   SUPABASE_SERVICE_ROLE_KEY
+# Optional: GITHUB_TOKEN (for higher GitHub API rate limits during discovery)
+
+name: Ingest AI Tools
+
+on:
+  schedule:
+    # Run at 2:00 UTC on Sunday and Wednesday (every few days)
+    - cron: "0 2 * * 0,3"
+  workflow_dispatch:
+    # Allow manual run from Actions tab
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ingestion pipeline
+        run: npx tsx scripts/ingest-ai-tools.ts
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
