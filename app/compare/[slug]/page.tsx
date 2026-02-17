@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { comparisons, getComparisonBySlug, getToolBySlug } from "@/lib/db/tools";
 import { CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/types";
+import { BASE_URL } from "@/lib/config";
 
 export async function generateStaticParams() {
   return comparisons.map((comp) => ({ slug: comp.slug }));
@@ -48,9 +49,9 @@ export default async function ComparePage({ params }: { params: Promise<{ slug: 
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://hot100ai.dev" },
-      { "@type": "ListItem", position: 2, name: "Compare", item: "https://hot100ai.dev" },
-      { "@type": "ListItem", position: 3, name: `${toolA.name} vs ${toolB.name}`, item: `https://hot100ai.dev/compare/${slug}` },
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      { "@type": "ListItem", position: 2, name: "Compare", item: BASE_URL },
+      { "@type": "ListItem", position: 3, name: `${toolA.name} vs ${toolB.name}`, item: `${BASE_URL}/compare/${slug}` },
     ],
   };
 
@@ -59,11 +60,11 @@ export default async function ComparePage({ params }: { params: Promise<{ slug: 
     "@type": "WebPage",
     name: comparison.seoTitle,
     description: comparison.seoDescription,
-    url: `https://hot100ai.dev/compare/${slug}`,
+    url: `${BASE_URL}/compare/${slug}`,
     isPartOf: {
       "@type": "WebSite",
       name: "Hot 100 AI",
-      url: "https://hot100ai.dev",
+      url: BASE_URL,
     },
   };
 

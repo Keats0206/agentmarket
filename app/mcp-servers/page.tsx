@@ -2,19 +2,67 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { mcpPlatforms, getAllTools } from "@/lib/db/tools";
 import ToolCard from "@/components/ToolCard";
+import { BASE_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "MCP Server Directory — Find the Best Model Context Protocol Servers",
   description:
     "The most comprehensive directory of MCP (Model Context Protocol) servers. Browse by platform, use case, and integration. Find MCP servers for GitHub, Slack, Notion, databases, and more.",
+  alternates: { canonical: "/mcp-servers" },
 };
+
+const MCP_FAQ_ANSWER =
+  "The Model Context Protocol (MCP) is an open standard developed by Anthropic that enables AI assistants to connect with external data sources and tools. Think of it as a USB port for AI — a standardized way for AI agents to interact with the world. MCP servers expose capabilities (tools, resources, prompts) that AI clients like Claude, Cursor, and Windsurf can use. This allows AI agents to read files, query databases, send messages, browse the web, and much more — all through a secure, standardized protocol. The ecosystem is growing rapidly, with servers available for GitHub, Slack, Notion, PostgreSQL, web browsing, and dozens of other platforms and services.";
 
 export default async function MCPServersPage() {
   const tools = await getAllTools();
   const allMCPServers = tools.filter((t) => t.category === "mcp-server");
 
+  const webPageLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "MCP Server Directory — Find the Best Model Context Protocol Servers",
+    description:
+      "The most comprehensive directory of MCP (Model Context Protocol) servers. Browse by platform, use case, and integration.",
+    url: `${BASE_URL}/mcp-servers`,
+    mainEntity: {
+      "@type": "ItemList",
+      name: "MCP Servers",
+      numberOfItems: allMCPServers.length,
+      itemListElement: allMCPServers.slice(0, 50).map((tool, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: tool.name,
+        url: `${BASE_URL}/tool/${tool.slug}`,
+      })),
+    },
+  };
+
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is MCP (Model Context Protocol)?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: MCP_FAQ_ANSWER,
+        },
+      },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-xs text-muted">
         <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
@@ -38,7 +86,8 @@ export default async function MCPServersPage() {
       </div>
 
       {/* Platform Categories — sage green section */}
-      <div className="rounded-2xl bg-[#D9E8DC] border border-[#C5D8C9] p-6 mb-12">
+      <section aria-label="Browse by platform" className="rounded-2xl bg-[#D9E8DC] border border-[#C5D8C9] p-6 mb-12">
+        <h2 className="sr-only">Browse by Platform</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {mcpPlatforms.map((platform) => (
             <Link
@@ -59,7 +108,7 @@ export default async function MCPServersPage() {
             </Link>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* All MCP Servers */}
       <section>

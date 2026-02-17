@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getAllTools, getToolBySlug, formatStars, comparisons, categories } from "@/lib/db/tools";
 import { CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/types";
+import { BASE_URL } from "@/lib/config";
 
 export async function generateStaticParams() {
   const tools = await getAllTools();
@@ -48,6 +49,10 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
     name: tool.name,
     description: tool.description,
     url: tool.websiteUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/tool/${slug}`,
+    },
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Cross-platform",
     offers: {
@@ -70,9 +75,9 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://hot100ai.dev" },
-      { "@type": "ListItem", position: 2, name: `${CATEGORY_LABELS[tool.category]}s`, item: `https://hot100ai.dev/search?q=${tool.category}` },
-      { "@type": "ListItem", position: 3, name: tool.name, item: `https://hot100ai.dev/tool/${slug}` },
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      { "@type": "ListItem", position: 2, name: `${CATEGORY_LABELS[tool.category]}s`, item: `${BASE_URL}/search?q=${tool.category}` },
+      { "@type": "ListItem", position: 3, name: tool.name, item: `${BASE_URL}/tool/${slug}` },
     ],
   };
 
@@ -159,6 +164,16 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           )}
         </div>
       </div>
+
+      {/* What is [Tool]? — definition block for direct-answer / AI parsing */}
+      <section aria-label="Definition" className="mt-8 rounded-2xl border border-border bg-card p-6">
+        <h2 className="font-serif text-lg font-medium text-foreground">
+          What is {tool.name}?
+        </h2>
+        <p className="mt-3 text-sm text-foreground/80 leading-relaxed">
+          <strong>{tool.name}</strong> is {tool.shortDescription.charAt(0).toLowerCase() + tool.shortDescription.slice(1)}
+        </p>
+      </section>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
         {/* Main Content */}

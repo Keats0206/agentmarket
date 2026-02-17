@@ -25,7 +25,9 @@ export default function SubmitPage() {
       </p>
 
       {/* Pricing Tiers */}
-      <div className="mt-10 grid gap-4 sm:grid-cols-3">
+      <section aria-label="Pricing tiers">
+        <h2 className="font-serif text-xl font-medium text-foreground mt-10 mb-4">Choose Your Tier</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-border bg-card p-6">
           <h3 className="text-sm font-semibold text-foreground">Basic Listing</h3>
           <div className="mt-2 font-serif text-2xl font-medium text-foreground">Free</div>
@@ -94,6 +96,7 @@ export default function SubmitPage() {
           </ul>
         </div>
       </div>
+      </section>
 
       {/* Submit Form */}
       <div className="mt-12">

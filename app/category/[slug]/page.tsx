@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { categories, getCategoryBySlug, getToolBySlug, sortByPremium } from "@/lib/db/tools";
 import ToolCard from "@/components/ToolCard";
+import { BASE_URL } from "@/lib/config";
 
 export async function generateStaticParams() {
   return categories.map((cat) => ({ slug: cat.slug }));
@@ -39,9 +40,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://hot100ai.dev" },
-      { "@type": "ListItem", position: 2, name: "Categories", item: "https://hot100ai.dev" },
-      { "@type": "ListItem", position: 3, name: category.title, item: `https://hot100ai.dev/category/${slug}` },
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      { "@type": "ListItem", position: 2, name: "Categories", item: BASE_URL },
+      { "@type": "ListItem", position: 3, name: category.title, item: `${BASE_URL}/category/${slug}` },
     ],
   };
 
@@ -50,7 +51,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     "@type": "CollectionPage",
     name: category.title,
     description: category.description,
-    url: `https://hot100ai.dev/category/${slug}`,
+    url: `${BASE_URL}/category/${slug}`,
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: categoryTools.length,
@@ -58,7 +59,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         "@type": "ListItem",
         position: i + 1,
         name: tool.name,
-        url: `https://hot100ai.dev/tool/${tool.slug}`,
+        url: `${BASE_URL}/tool/${tool.slug}`,
       })),
     },
   };

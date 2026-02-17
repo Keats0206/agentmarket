@@ -50,6 +50,20 @@ export interface MCPPlatform {
   toolSlugs: string[];
 }
 
+export interface Listicle {
+  slug: string;
+  title: string;
+  seoTitle: string;
+  seoDescription: string;
+  description: string;
+  categorySlugs: string[];
+  customSection?: { title: string; body: string };
+  /** ISO date for Article schema. Defaults to 2025-02-01 if omitted. */
+  dateModified?: string;
+  /** ISO date for Article schema. Defaults to 2025-01-01 if omitted. */
+  datePublished?: string;
+}
+
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   agent: "AI Agent",
   "mcp-server": "MCP Server",

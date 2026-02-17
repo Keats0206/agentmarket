@@ -1,10 +1,11 @@
 import type { Tool, ToolCategory } from "../types";
 import { categories } from "../data/categories";
 import { comparisons } from "../data/comparisons";
+import { listicles, getListicleBySlug } from "../data/listicles";
 import { mcpPlatforms } from "../data/mcpPlatforms";
 
-export { categories, comparisons, mcpPlatforms };
-export type { CategoryPage, ComparisonPage, MCPPlatform } from "../types";
+export { categories, comparisons, listicles, getListicleBySlug, mcpPlatforms };
+export type { CategoryPage, ComparisonPage, Listicle, MCPPlatform } from "../types";
 
 // ---------------------------------------------------------------------------
 // Unified data access layer for tools.

@@ -16,8 +16,12 @@
  *
  * Estimated cost: ~$0.01-0.03 per tool (GPT-4o-mini for discovery + enrichment).
  * A run of 100 new tools costs roughly $1-3.
+ *
+ * When run locally, loads .env.local automatically — just run:
+ *   npx tsx scripts/ingest-ai-tools.ts
  */
 
+import "./load-env";
 import { createClient } from "@supabase/supabase-js";
 import { discoverCandidates, type Candidate } from "./discover-candidates";
 import { enrichCandidate, type ToolRow } from "../lib/ai/enrich-tool";

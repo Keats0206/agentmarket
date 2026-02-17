@@ -3,6 +3,7 @@ import SearchBar from "@/components/SearchBar";
 import ToolCard from "@/components/ToolCard";
 import { getAllTools, categories, comparisons, getStats, getFeaturedTools } from "@/lib/db/tools";
 import { CATEGORY_LABELS, CATEGORY_COLORS, type ToolCategory } from "@/lib/types";
+import { BASE_URL } from "@/lib/config";
 
 export default async function Home() {
   const [tools, featured, stats] = await Promise.all([
@@ -22,11 +23,11 @@ export default async function Home() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Hot 100 AI",
-    url: "https://hot100ai.dev",
+    url: BASE_URL,
     description: "The canonical index of AI agents, MCP servers, and agentic tools.",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://hot100ai.dev/search?q={search_term_string}",
+      target: `${BASE_URL}/search?q={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
   };
@@ -40,7 +41,7 @@ export default async function Home() {
       "@type": "ListItem",
       position: i + 1,
       name: tool.name,
-      url: `https://hot100ai.dev/tool/${tool.slug}`,
+      url: `${BASE_URL}/tool/${tool.slug}`,
     })),
   };
 

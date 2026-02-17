@@ -4,6 +4,7 @@ import { Lora } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { BASE_URL } from "@/lib/config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,7 +24,7 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hot100ai.dev"),
+  metadataBase: new URL(BASE_URL),
   title: {
     default: "Hot 100 AI — The Canonical Index of AI Agents, MCP Servers & Agentic Tools",
     template: "%s — Hot 100 AI",
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Hot 100 AI — The BuiltWith for AI Agents",
     description: "The canonical index of AI agents, MCP servers, and agentic tools.",
-    url: "https://hot100ai.dev",
+    url: BASE_URL,
     siteName: "Hot 100 AI",
     type: "website",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Hot 100 AI" }],
@@ -67,11 +68,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const organizationLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Hot 100 AI",
+    url: BASE_URL,
+    description:
+      "The canonical index of AI agents, MCP servers, and agentic tools.",
+  };
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased min-h-screen flex flex-col`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }}
+        />
         <Navbar />
         <main className="flex-1 pt-16">{children}</main>
         <Footer />

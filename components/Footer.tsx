@@ -17,6 +17,17 @@ export default function Footer() {
             </p>
           </div>
 
+          {/* Best of / Listicles */}
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#9A948D]">Best of</h3>
+            <ul className="mt-3 space-y-2">
+              <li><Link href="/best/best-ai-agent-frameworks" className="text-sm text-[#B0AAA3] hover:text-white transition-colors">Best AI Agent Frameworks</Link></li>
+              <li><Link href="/best/best-mcp-servers-for-2025" className="text-sm text-[#B0AAA3] hover:text-white transition-colors">Best MCP Servers 2025</Link></li>
+              <li><Link href="/best/best-vector-databases" className="text-sm text-[#B0AAA3] hover:text-white transition-colors">Best Vector Databases</Link></li>
+              <li><Link href="/best/best-ai-coding-agents" className="text-sm text-[#B0AAA3] hover:text-white transition-colors">Best AI Coding Agents</Link></li>
+            </ul>
+          </div>
+
           {/* Categories */}
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#9A948D]">Categories</h3>

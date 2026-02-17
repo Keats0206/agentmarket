@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { tools as staticTools, categories, comparisons, mcpPlatforms } from "@/lib/data";
-
-const BASE_URL = "https://hot100ai.dev";
+import { listicles } from "@/lib/data/listicles";
+import { BASE_URL } from "@/lib/config";
 
 /**
  * Fetch published tools from Supabase when available, otherwise fall back to
@@ -50,9 +50,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/search`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${BASE_URL}/submit`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/mcp-servers`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${BASE_URL}/best-mcp-servers-for-2025`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
-    { url: `${BASE_URL}/best-ai-agent-frameworks`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
   ];
+
+  const listiclePages: MetadataRoute.Sitemap = listicles.map((l) => ({
+    url: `${BASE_URL}/best/${l.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }));
 
   const toolPages: MetadataRoute.Sitemap = tools.map((tool) => ({
     url: `${BASE_URL}/tool/${tool.slug}`,
@@ -82,5 +87,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...toolPages, ...categoryPages, ...comparisonPages, ...mcpPages];
+  return [...staticPages, ...listiclePages, ...toolPages, ...categoryPages, ...comparisonPages, ...mcpPages];
 }
