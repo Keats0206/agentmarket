@@ -12,7 +12,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-70">
           <span className="font-serif text-2xl font-semibold tracking-tight text-foreground">
-            Agent<span className="text-accent">Index</span>
+            Hot100<span className="text-accent">AI</span>
           </span>
         </Link>
 
