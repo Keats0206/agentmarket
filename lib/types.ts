@@ -22,6 +22,14 @@ export interface Tool {
   cons: string[];
   setupComplexity: "Low" | "Medium" | "High";
   maturity: "Early" | "Growing" | "Mature";
+  // MCP-specific metadata (optional, for client compatibility & trust)
+  clientCompatibility?: ("claude-code" | "cursor" | "chatgpt" | "custom" | "vs-code" | "desktop-app")[];
+  memorySupport?: "yes" | "no" | "partial";
+  maintainedStatus?: "actively-maintained" | "stable" | "deprecated";
+  bestFor?: string[];
+  securityNotes?: string;
+  selfHosted?: boolean;
+  authModel?: string;
 }
 
 export interface CategoryPage {

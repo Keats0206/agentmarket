@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -rf /Users/petekeating/Desktop/agentmarket/.claude/skills)",
+      "Bash(mkdir -p /Users/petekeating/Desktop/agentmarket/.claude/skills)",
+      "Bash(ln -s /tmp/gtm-engineer-skills/__TRACKED_VAR__ /Users/petekeating/Desktop/agentmarket/.claude/skills/__TRACKED_VAR__)",
+      "WebSearch",
+      "WebFetch(domain:hot100ai.dev)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000/best/best-mcp-servers-claude-code)",
+      "Bash(pkill -f \"npm run dev\")",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(pkill -9 -f \"node\")",
+      "Bash(curl -s http://localhost:3001/best/best-mcp-servers-claude-code)",
+      "Bash(pkill -9 -f \"npm run dev\")",
+      "Bash(curl -s http://localhost:3001)",
+      "Bash(curl -s http://localhost:3002)"
+    ]
+  }
+}

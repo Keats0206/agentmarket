@@ -48,6 +48,13 @@ function rowToTool(row: Record<string, unknown>): Tool {
     cons: (row.cons ?? []) as string[],
     setupComplexity: row.setup_complexity as Tool["setupComplexity"],
     maturity: row.maturity as Tool["maturity"],
+    clientCompatibility: (row.client_compatibility ?? undefined) as Tool["clientCompatibility"],
+    memorySupport: (row.memory_support ?? undefined) as Tool["memorySupport"],
+    maintainedStatus: (row.maintained_status ?? undefined) as Tool["maintainedStatus"],
+    bestFor: (row.best_for ?? undefined) as Tool["bestFor"],
+    securityNotes: (row.security_notes ?? undefined) as string | undefined,
+    selfHosted: (row.self_hosted ?? undefined) as boolean | undefined,
+    authModel: (row.auth_model ?? undefined) as string | undefined,
   };
 }
 

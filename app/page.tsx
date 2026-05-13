@@ -24,7 +24,7 @@ export default async function Home() {
     "@type": "WebSite",
     name: "Hot 100 AI",
     url: BASE_URL,
-    description: "The canonical index of AI agents, MCP servers, and agentic tools.",
+    description: "The trust layer for MCP discovery. Find MCP servers that actually work.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${BASE_URL}/search?q={search_term_string}`,
@@ -60,18 +60,18 @@ export default async function Home() {
         <div className="relative mx-auto max-w-4xl px-4 pb-16 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-32 lg:px-8">
           {/* Badge */}
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            <span className="text-lg">🤖</span>
             <span className="text-xs font-medium text-muted">
-              {stats.totalTools} tools indexed &middot; Updated daily
+              {stats.totalTools} tools indexed &middot; ✨ Updated daily
             </span>
           </div>
 
           <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.15]">
-            The canonical index of AI agents, MCP servers & agentic tools
+            The trust layer for MCP discovery
           </h1>
 
           <p className="mx-auto mt-6 max-w-xl text-lg text-muted leading-relaxed">
-            Discover, compare, and choose the right tools for your AI stack.
+            Find MCP servers that actually work for your client, your workflow, and your stack.
             Built by developers, for developers.
           </p>
 
@@ -82,11 +82,11 @@ export default async function Home() {
 
           {/* Quick links */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-muted">
-            <span>Popular:</span>
-            <Link href="/search?q=mcp+server" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">MCP Servers</Link>
-            <Link href="/search?q=code+review" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">Code Review</Link>
-            <Link href="/compare/langchain-vs-llamaindex" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">LangChain vs LlamaIndex</Link>
-            <Link href="/search?q=vector+database" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">Vector DBs</Link>
+            <span>✨ Explore:</span>
+            <Link href="/best/best-mcp-servers-claude-code" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">🤖 Claude Code</Link>
+            <Link href="/best/best-mcp-servers-cursor" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">✏️ Cursor</Link>
+            <Link href="/best/best-memory-mcp-servers" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">🧠 Memory</Link>
+            <Link href="/search?q=mcp+server" className="rounded-full border border-border bg-card px-3 py-1 transition-colors hover:bg-card-hover hover:text-foreground">🔍 All</Link>
           </div>
         </div>
       </section>

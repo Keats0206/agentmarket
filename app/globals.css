@@ -1,31 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F5F0EB;
-  --foreground: #1A1A1A;
-  --card: #EBE5DE;
-  --card-hover: #E3DCD4;
-  --border: #D8D0C6;
-  --border-hover: #C5BCB0;
-  --muted: #7A746D;
-  --accent: #C07A50;
-  --accent-hover: #A96A44;
-  --accent-dim: rgba(192, 122, 80, 0.08);
-  --footer-bg: #1A1A1A;
-  --footer-text: #E5E0DA;
-  --footer-muted: #9A948D;
-  /* Section backgrounds (homepage curated/comparisons/CTA) */
-  --section-green-bg: #D9E8DC;
-  --section-green-border: #C5D8C9;
-  --section-green-muted: #5A6E5D;
-  --section-lavender-bg: #DDD8E8;
-  --section-lavender-border: #CCC6D8;
-  --section-lavender-muted: #5E576B;
-  --section-lavender-accent: #8A8394;
-  --section-warm-bg: #E8DDD4;
-  --section-warm-border: #D8CCBE;
-  --section-warm-muted: #6E6358;
-  --section-warm-border-alt: #C5B8A8;
+  /* Cute, simple palette: white, soft gray, blue */
+  --background: #FFFFFF;
+  --foreground: #1F2937;
+  --card: #F8FAFC;
+  --card-hover: #F1F5F9;
+  --border: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --muted: #64748B;
+  --accent: #3B82F6;
+  --accent-hover: #2563EB;
+  --accent-dim: rgba(59, 130, 246, 0.08);
+  --footer-bg: #F8FAFC;
+  --footer-text: #334155;
+  --footer-muted: #94A3B8;
+  /* Section backgrounds with soft colors */
+  --section-green-bg: #DBEAFE;
+  --section-green-border: #BFDBFE;
+  --section-green-muted: #1E40AF;
+  --section-lavender-bg: #EDE9FE;
+  --section-lavender-border: #DDD6FE;
+  --section-lavender-muted: #6366F1;
+  --section-lavender-accent: #818CF8;
+  --section-warm-bg: #FEF3C7;
+  --section-warm-border: #FDE68A;
+  --section-warm-muted: #92400E;
+  --section-warm-border-alt: #FCD34D;
 }
 
 @theme inline {
