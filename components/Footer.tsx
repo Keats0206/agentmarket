@@ -69,6 +69,8 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <Link href="/submit" className="text-xs text-[#9A948D] hover:text-white transition-colors">Submit a Tool</Link>
             <span className="text-[#333]">|</span>
+            <a href="https://artificialjobs.dev" target="_blank" rel="noreferrer" className="text-xs text-[#9A948D] hover:text-white transition-colors">AI Jobs</a>
+            <span className="text-[#333]">|</span>
             <a href="mailto:hello@hot100ai.dev" className="text-xs text-[#9A948D] hover:text-white transition-colors">Contact</a>
             <span className="text-[#333]">|</span>
             <Link href="/search" className="text-xs text-[#9A948D] hover:text-white transition-colors">Search</Link>
