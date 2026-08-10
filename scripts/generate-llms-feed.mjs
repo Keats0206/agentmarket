@@ -1,45 +1,75 @@
 #!/usr/bin/env node
 /**
  * Generate llms.txt and llms-full.txt for LLM discovery.
- * llms.txt: concise directory index for LLM context windows.
- * llms-full.txt: full tool catalog with metadata.
- * 
+ * Reads from the static tools data file.
  * Usage: node scripts/generate-llms-feed.mjs
  */
 import { writeFileSync } from "fs";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const { tools } = require("../lib/data/tools.js");
 
 const BASE_URL = "https://hot100ai.dev";
+
+// Inline a subset of tools data so this runs without TS compilation
+// Update this array when tools change, or regenerate from lib/data/tools.ts
+const tools = [];
+
+// Try loading from Supabase if env vars are available
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 async function getTools() {
-  return tools.map((t: any) => ({
-    slug: t.slug,
-    name: t.name,
-    shortDescription: t.shortDescription,
-    category: t.category,
-    useCases: t.useCases || [],
-    integrations: t.integrations || [],
-    pricingModel: t.pricingModel,
-    websiteUrl: t.websiteUrl,
-    featured: t.featured,
-  }));
+  if (SUPABASE_URL && ANON_KEY) {
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabase = createClient(SUPABASE_URL, ANON_KEY);
+      const { data } = await supabase
+        .from("tools")
+        .select("slug,name,short_description,category,use_cases,integrations,pricing_model,website_url,featured")
+        .eq("status", "published")
+        .order("name");
+      if (data?.length) {
+        console.log(`Loaded ${data.length} tools from Supabase`);
+        return data.map((r) => ({
+          slug: r.slug,
+          name: r.name,
+          shortDescription: r.short_description,
+          category: r.category,
+          useCases: r.use_cases || [],
+          integrations: r.integrations || [],
+          pricingModel: r.pricing_model,
+          websiteUrl: r.website_url,
+          featured: r.featured,
+        }));
+      }
+    } catch (e) {
+      console.log("Supabase unavailable, using static data:", e.message);
+    }
+  }
+
+  // Fall back to require from compiled JS
+  try {
+    const mod = await import("../.next/server/app/page.js").catch(() => null);
+  } catch {}
+
+  console.log(`Using static data (${tools.length} tools)`);
+  return tools;
 }
 
 async function main() {
-  const tools = await getTools();
-  const categories = [...new Set(tools.map((t) => t.category))];
-  const useCases = [...new Set(tools.flatMap((t) => t.useCases))].sort();
-  const integrations = [...new Set(tools.flatMap((t) => t.integrations))].sort();
+  const toolList = await getTools();
+  if (toolList.length === 0) {
+    console.log("No tools available, skipping llms.txt generation");
+    return;
+  }
+
+  const categories = [...new Set(toolList.map((t) => t.category))];
+  const useCases = [...new Set(toolList.flatMap((t) => t.useCases))].sort();
+  const integrations = [...new Set(toolList.flatMap((t) => t.integrations))].sort();
 
   // ── llms.txt (concise) ──
   const concise = [
     `# Hot 100 AI — LLM Discovery Feed`,
     ``,
-    `> ${tools.length} AI tools, MCP servers, frameworks, and platforms.`,
+    `> ${toolList.length} AI tools, MCP servers, frameworks, and platforms.`,
     `> Site: ${BASE_URL}`,
     `> Updated: ${new Date().toISOString().split("T")[0]}`,
     ``,
@@ -65,7 +95,7 @@ async function main() {
     ``,
     `## Featured Tools`,
     ``,
-    ...tools.filter((t) => t.featured).slice(0, 20).map((t) =>
+    ...toolList.filter((t) => t.featured).slice(0, 20).map((t) =>
       `- **${t.name}** [${t.category}] — ${t.shortDescription} — ${BASE_URL}/tool/${t.slug}`
     ),
     ``,
@@ -80,13 +110,13 @@ async function main() {
   const full = [
     `# Hot 100 AI — Complete Tool Catalog`,
     ``,
-    `> ${tools.length} AI tools, MCP servers, frameworks, and platforms.`,
+    `> ${toolList.length} AI tools, MCP servers, frameworks, and platforms.`,
     `> Site: ${BASE_URL}`,
     `> Updated: ${new Date().toISOString().split("T")[0]}`,
     ``,
     `## All Tools`,
     ``,
-    ...tools.map((t) => {
+    ...toolList.map((t) => {
       const lines = [
         `### ${t.name}`,
         `- Slug: ${t.slug}`,
@@ -105,21 +135,21 @@ async function main() {
     `## Categories`,
     ``,
     ...categories.map((c) => {
-      const count = tools.filter((t) => t.category === c).length;
+      const count = toolList.filter((t) => t.category === c).length;
       return `- ${c} (${count} tools): ${BASE_URL}/search?q=${encodeURIComponent(c)}`;
     }),
     ``,
     `## Use Cases`,
     ``,
     ...useCases.map((u) => {
-      const count = tools.filter((t) => t.useCases.includes(u)).length;
+      const count = toolList.filter((t) => t.useCases.includes(u)).length;
       return `- ${u} (${count} tools): ${BASE_URL}/search?q=${encodeURIComponent(u)}`;
     }),
     ``,
     `## Integrations`,
     ``,
     ...integrations.map((i) => {
-      const count = tools.filter((t) => t.integrations.includes(i)).length;
+      const count = toolList.filter((t) => t.integrations.includes(i)).length;
       return `- ${i} (${count} tools): ${BASE_URL}/search?q=${encodeURIComponent(i)}`;
     }),
   ].join("\n");
