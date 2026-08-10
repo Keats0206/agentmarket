@@ -52,6 +52,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/mcp-servers`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
   ];
 
+  // pSEO: use-case pages
+  const useCaseSlugs = new Set<string>();
+  for (const t of tools) {
+    for (const uc of (t as any).useCases || []) {
+      useCaseSlugs.add(uc.toLowerCase().replace(/\s+/g, "-"));
+    }
+  }
+  const useCasePages: MetadataRoute.Sitemap = [...useCaseSlugs].map((slug) => ({
+    url: `${BASE_URL}/use-case/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  // pSEO: integration pages
+  const integrationSlugs = new Set<string>();
+  for (const t of tools) {
+    for (const int of (t as any).integrations || []) {
+      integrationSlugs.add(int.toLowerCase().replace(/\s+/g, "-"));
+    }
+  }
+  const integrationPages: MetadataRoute.Sitemap = [...integrationSlugs].map((slug) => ({
+    url: `${BASE_URL}/integration/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.65,
+  }));
+
   const listiclePages: MetadataRoute.Sitemap = listicles.map((l) => ({
     url: `${BASE_URL}/best/${l.slug}`,
     lastModified: now,
@@ -87,5 +115,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...listiclePages, ...toolPages, ...categoryPages, ...comparisonPages, ...mcpPages];
+  return [...staticPages, ...listiclePages, ...toolPages, ...categoryPages, ...comparisonPages, ...mcpPages, ...useCasePages, ...integrationPages];
 }
