@@ -6,20 +6,34 @@ import { BASE_URL } from "@/lib/config";
 
 type Props = { params: Promise<{ slug: string }> };
 
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9\s-]/g, "").split(/\s+/).slice(0, 5).join("-");
+}
+
+function capitalize(s: string): string {
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function matchUseCase(useCase: string, slug: string): boolean {
+  return slugify(useCase) === slug;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tools = await getAllTools();
-  const useCase = slug.replace(/-/g, " ");
   const matching = tools.filter((t) =>
-    t.useCases.some((u) => u.toLowerCase() === useCase)
+    t.useCases.some((uc) => matchUseCase(uc, slug))
   );
 
   if (matching.length === 0) {
     return { title: "Use Case Not Found — Hot 100 AI" };
   }
 
-  const title = `${matching.length} Best AI Tools for ${capitalize(useCase)} — Hot 100 AI`;
-  const description = `Compare the ${matching.length} best AI tools and MCP servers for ${useCase}. Production-ready ratings, pricing, and compatibility for Claude Code, Cursor, and more.`;
+  // Find the original use case display name
+  const displayName = tools.flatMap((t) => t.useCases).find((uc) => matchUseCase(uc, slug)) || slug;
+
+  const title = `${matching.length} Best AI Tools for ${capitalize(displayName)} — Hot 100 AI`;
+  const description = `Compare the ${matching.length} best AI tools and MCP servers for ${displayName}. Production-ready ratings, pricing, and compatibility.`;
 
   return {
     title,
@@ -34,7 +48,7 @@ export async function generateStaticParams() {
   const slugs = new Set<string>();
   for (const t of tools) {
     for (const uc of t.useCases) {
-      slugs.add(uc.toLowerCase().replace(/\s+/g, "-"));
+      slugs.add(slugify(uc));
     }
   }
   return [...slugs].map((slug) => ({ slug }));
@@ -43,10 +57,11 @@ export async function generateStaticParams() {
 export default async function UseCasePage({ params }: Props) {
   const { slug } = await params;
   const tools = await getAllTools();
-  const useCase = slug.replace(/-/g, " ");
   const matching = tools.filter((t) =>
-    t.useCases.some((u) => u.toLowerCase() === useCase)
+    t.useCases.some((uc) => matchUseCase(uc, slug))
   );
+
+  const displayName = matching.flatMap((t) => t.useCases).find((uc) => matchUseCase(uc, slug)) || slug;
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -54,15 +69,15 @@ export default async function UseCasePage({ params }: Props) {
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
       { "@type": "ListItem", position: 2, name: "Use Cases", item: `${BASE_URL}/search` },
-      { "@type": "ListItem", position: 3, name: capitalize(useCase) },
+      { "@type": "ListItem", position: 3, name: capitalize(displayName) },
     ],
   };
 
   const collectionLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `Best AI Tools for ${capitalize(useCase)}`,
-    description: `${matching.length} AI tools and MCP servers for ${useCase}`,
+    name: `Best AI Tools for ${capitalize(displayName)}`,
+    description: `${matching.length} AI tools and MCP servers for ${displayName}`,
     url: `${BASE_URL}/use-case/${slug}`,
     numberOfItems: matching.length,
   };
@@ -75,14 +90,14 @@ export default async function UseCasePage({ params }: Props) {
       <nav className="mb-6 text-xs text-muted">
         <Link href="/" className="hover:text-foreground">Home</Link>
         <span className="mx-2">/</span>
-        <span className="text-foreground">{capitalize(useCase)}</span>
+        <span className="text-foreground">{capitalize(displayName)}</span>
       </nav>
 
       <h1 className="font-serif text-3xl font-medium text-foreground">
-        Best AI Tools for {capitalize(useCase)}
+        Best AI Tools for {capitalize(displayName)}
       </h1>
       <p className="mt-3 text-muted leading-relaxed">
-        {matching.length} tools and MCP servers for {useCase}. Compare pricing, compatibility, setup complexity, and production readiness.
+        {matching.length} tools and MCP servers for {displayName}. Compare pricing, compatibility, setup complexity, and production readiness.
       </p>
 
       {matching.length > 0 ? (
@@ -96,17 +111,19 @@ export default async function UseCasePage({ params }: Props) {
       )}
 
       {/* Related use cases */}
-      <RelatedUseCases current={useCase} tools={tools} />
+      <RelatedUseCases current={displayName} tools={tools} />
     </div>
   );
 }
 
 function RelatedUseCases({ current, tools }: { current: string; tools: Awaited<ReturnType<typeof getAllTools>> }) {
   const related = new Set<string>();
-  const matchingTools = tools.filter((t) => t.useCases.some((u) => u.toLowerCase() === current));
+  const matchingTools = tools.filter((t) =>
+    t.useCases.some((uc) => uc.toLowerCase() === current.toLowerCase())
+  );
   for (const t of matchingTools) {
     for (const uc of t.useCases) {
-      if (uc.toLowerCase() !== current) related.add(uc.toLowerCase());
+      if (uc.toLowerCase() !== current.toLowerCase()) related.add(uc.toLowerCase());
     }
   }
 
@@ -119,7 +136,7 @@ function RelatedUseCases({ current, tools }: { current: string; tools: Awaited<R
         {[...related].slice(0, 12).map((uc) => (
           <Link
             key={uc}
-            href={`/use-case/${uc.replace(/\s+/g, "-")}`}
+            href={`/use-case/${slugify(uc)}`}
             className="rounded-full border border-border bg-card px-3 py-1 text-xs transition-colors hover:bg-card-hover hover:text-foreground"
           >
             {capitalize(uc)}
@@ -128,8 +145,4 @@ function RelatedUseCases({ current, tools }: { current: string; tools: Awaited<R
       </div>
     </section>
   );
-}
-
-function capitalize(s: string): string {
-  return s.replace(/\b\w/g, (c) => c.toUpperCase());
 }

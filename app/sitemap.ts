@@ -52,11 +52,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/mcp-servers`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
   ];
 
-  // pSEO: use-case pages
+  function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9\s-]/g, "").split(/\s+/).slice(0, 5).join("-");
+}
+
+// pSEO: use-case pages
   const useCaseSlugs = new Set<string>();
   for (const t of tools) {
     for (const uc of (t as any).useCases || []) {
-      useCaseSlugs.add(uc.toLowerCase().replace(/\s+/g, "-"));
+      useCaseSlugs.add(slugify(uc));
     }
   }
   const useCasePages: MetadataRoute.Sitemap = [...useCaseSlugs].map((slug) => ({
