@@ -42,7 +42,7 @@ async function getUser() {
 
 async function getUserData(userId: string) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return { account: null, tools: [], subscriptions: [], submissions: [] };
+    return { account: null, tools: [], subscriptions: [], submissions: [], affiliateStats: [] };
   }
 
   const { createClient } = await import("@supabase/supabase-js");
@@ -80,11 +80,35 @@ async function getUserData(userId: string) {
     .eq("account_id", userId)
     .order("created_at", { ascending: false });
 
+  // Get affiliate click stats for the user's tools
+  let affiliateStats: Record<string, unknown>[] = [];
+  const toolSlugs = (tools || []).map((t: Record<string, unknown>) => t.slug as string);
+  if (toolSlugs.length > 0) {
+    const { data: clicks } = await supabase
+      .from("affiliate_clicks")
+      .select("tool_slug, created_at")
+      .in("tool_slug", toolSlugs)
+      .gte("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+    if (clicks) {
+      // Aggregate clicks per tool slug
+      const agg = new Map<string, number>();
+      for (const c of clicks as { tool_slug: string }[]) {
+        agg.set(c.tool_slug, (agg.get(c.tool_slug) || 0) + 1);
+      }
+      affiliateStats = Array.from(agg.entries()).map(([tool_slug, clicks]) => ({
+        tool_slug,
+        clicks_30d: clicks,
+      }));
+    }
+  }
+
   return {
     account,
     tools: tools || [],
     subscriptions: subscriptions || [],
     submissions: submissions || [],
+    affiliateStats,
   };
 }
 
@@ -95,10 +119,15 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
-  const { account, tools, subscriptions, submissions } = await getUserData(user.id);
+  const { account, tools, subscriptions, submissions, affiliateStats } = await getUserData(user.id);
 
   const activeSubscriptions = subscriptions.filter(
     (s: Record<string, unknown>) => s.status === "active"
+  );
+
+  const totalAffiliateClicks = affiliateStats.reduce(
+    (sum: number, s: Record<string, unknown>) => sum + (s.clicks_30d as number),
+    0
   );
 
   return (
@@ -118,7 +147,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-3 mb-8">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="text-2xl font-serif font-semibold text-foreground">{tools.length}</div>
           <div className="text-xs text-muted mt-1">My Listings</div>
@@ -130,6 +159,10 @@ export default async function DashboardPage() {
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="text-2xl font-serif font-semibold text-foreground">{submissions.length}</div>
           <div className="text-xs text-muted mt-1">Submissions</div>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="text-2xl font-serif font-semibold text-foreground">{totalAffiliateClicks}</div>
+          <div className="text-xs text-muted mt-1">Affiliate Clicks (30d)</div>
         </div>
       </div>
 

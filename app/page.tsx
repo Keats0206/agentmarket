@@ -243,7 +243,7 @@ export default async function Home() {
               Submit Your Tool — Free
             </Link>
             <Link
-              href="/submit"
+              href="/pricing"
               className="rounded-xl bg-white/50 px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-white/80"
               style={{ borderColor: "var(--section-warm-border-alt)", borderWidth: 1, borderStyle: "solid" }}
             >

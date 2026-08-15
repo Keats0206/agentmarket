@@ -41,6 +41,8 @@ function rowToTool(row: Record<string, unknown>): Tool {
     githubStars: (row.github_stars ?? undefined) as number | undefined,
     websiteUrl: row.website_url as string,
     docsUrl: (row.docs_url ?? undefined) as string | undefined,
+    affiliateUrl: (row.affiliate_url ?? undefined) as string | undefined,
+    affiliateEnabled: (row.affiliate_enabled ?? undefined) as boolean | undefined,
     featured: row.featured as boolean,
     sponsoredTier: (row.sponsored_tier ?? undefined) as Tool["sponsoredTier"],
     lastUpdated: row.last_updated as string,

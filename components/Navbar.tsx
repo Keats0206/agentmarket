@@ -35,6 +35,12 @@ export default function Navbar() {
         {/* CTA + Mobile Toggle */}
         <div className="flex items-center gap-3">
           <Link
+            href="/pricing"
+            className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground md:block"
+          >
+            Pricing
+          </Link>
+          <Link
             href="/dashboard"
             className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:block"
           >
@@ -82,6 +88,9 @@ export default function Navbar() {
             </Link>
             <Link href="/search" className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:text-foreground" onClick={() => setMobileOpen(false)}>
               Search
+            </Link>
+            <Link href="/pricing" className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:text-foreground" onClick={() => setMobileOpen(false)}>
+              Pricing
             </Link>
             <Link href="/dashboard" className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:text-foreground" onClick={() => setMobileOpen(false)}>
               Dashboard

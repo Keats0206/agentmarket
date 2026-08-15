@@ -142,7 +142,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
         {/* Action buttons */}
         <div className="flex shrink-0 gap-2">
           <a
-            href={tool.websiteUrl}
+            href={`/go/${slug}`}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-xl bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-80"
@@ -164,6 +164,14 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           )}
         </div>
       </div>
+
+      {/* Affiliate disclosure */}
+      {tool.affiliateUrl && (
+        <p className="mt-4 text-xs text-muted">
+          Disclosure: When you click links to {tool.name}, we may earn a commission
+          from our affiliate partners at no extra cost to you. This helps keep Hot 100 AI free.
+        </p>
+      )}
 
       {/* What is [Tool]? — definition block for direct-answer / AI parsing */}
       <section aria-label="Definition" className="mt-8 rounded-2xl border border-border bg-card p-6">
@@ -317,7 +325,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           <section className="rounded-2xl border border-border bg-card p-5">
             <h3 className="text-sm font-semibold text-foreground">Links</h3>
             <div className="mt-3 space-y-2">
-              <a href={tool.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-accent hover:text-accent-hover transition-colors">
+              <a href={`/go/${slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-accent hover:text-accent-hover transition-colors">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
                 Website
               </a>

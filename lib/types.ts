@@ -15,6 +15,8 @@ export interface Tool {
   githubStars?: number;
   websiteUrl: string;
   docsUrl?: string;
+  affiliateUrl?: string;
+  affiliateEnabled?: boolean;
   featured: boolean;
   sponsoredTier?: "basic" | "category" | "premium";
   lastUpdated: string;
