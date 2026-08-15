@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { redirect } from "next/navigation";
+import { getPartnerStackSummary } from "@/lib/partnerstack";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -130,6 +131,9 @@ export default async function DashboardPage() {
     0
   );
 
+  // PartnerStack affiliate earnings (owner view — requires PARTNERSTACK_API_KEY)
+  const psSummary = await getPartnerStackSummary();
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
@@ -165,6 +169,82 @@ export default async function DashboardPage() {
           <div className="text-xs text-muted mt-1">Affiliate Clicks (30d)</div>
         </div>
       </div>
+
+      {/* PartnerStack Affiliate Earnings */}
+      <section className="mb-8">
+        <h2 className="font-serif text-lg font-medium text-foreground mb-4">Affiliate Revenue</h2>
+        {psSummary.configured ? (
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <div className="text-sm text-muted">Total Commissions</div>
+                <div className="mt-1 text-2xl font-serif font-semibold text-foreground">
+                  ${(psSummary.rewards.total_amount / 100).toFixed(2)}
+                </div>
+                <div className="text-xs text-muted mt-1">
+                  {psSummary.rewards.total_count} rewards · {psSummary.rewards.currency}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted">Paid Out</div>
+                <div className="mt-1 text-2xl font-serif font-semibold text-emerald-700">
+                  ${(psSummary.payouts.total_amount / 100).toFixed(2)}
+                </div>
+                <div className="text-xs text-muted mt-1">
+                  {psSummary.payouts.total_count} payouts
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted">Active Partnerships</div>
+                <div className="mt-1 text-2xl font-serif font-semibold text-foreground">
+                  {psSummary.partnerships.active}
+                </div>
+                <div className="text-xs text-muted mt-1">
+                  {psSummary.partnerships.total} total
+                </div>
+              </div>
+            </div>
+
+            {/* Pending vs paid */}
+            <div className="mt-5 flex items-center gap-2 text-xs text-muted">
+              <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
+              ${(psSummary.rewards.pending / 100).toFixed(2)} pending ·{" "}
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+              ${(psSummary.rewards.paid / 100).toFixed(2)} paid
+            </div>
+
+            {/* Partnership list */}
+            {psSummary.partnerships.companies.length > 0 && (
+              <div className="mt-5 border-t border-border pt-4">
+                <div className="text-xs font-medium text-muted uppercase tracking-wider mb-2">
+                  Programs
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {psSummary.partnerships.companies.map((c) => (
+                    <span
+                      key={c.name}
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-medium border ${
+                        c.status === "active"
+                          ? "bg-emerald-100/70 text-emerald-700 border-emerald-200"
+                          : "bg-gray-100 text-gray-600 border-gray-200"
+                      }`}
+                    >
+                      {c.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center">
+            <p className="text-sm text-muted">
+              PartnerStack not connected. Add <code className="text-foreground">PARTNERSTACK_API_KEY</code>{" "}
+              to see affiliate earnings here.
+            </p>
+          </div>
+        )}
+      </section>
 
       {/* My Listings */}
       <section className="mb-8">
